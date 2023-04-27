@@ -13,7 +13,7 @@ import timeGridPlugin from '@fullcalendar/daygrid';
 import listPlugin from '@fullcalendar/interaction';
 import interactionPlugin from '@fullcalendar/interaction';
 import { CalendarComponent } from './calendar/calendar.component'; // a plugin
-import { HttpClientModule } from "@angular/common/http";
+import { HttpClientModule } from "@angular/common";
 import { SelectDropDownModule } from 'ngx-select-dropdown';
 import { DateTimePickerComponent } from './components/date-time-picker/date-time-picker.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';

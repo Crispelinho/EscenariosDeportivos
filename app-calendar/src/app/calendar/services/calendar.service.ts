@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpHeaders, HttpClient } from '@angular/common/http';
+import { HttpHeaders, HttpClient } from '@angular/common';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import { icalendarApi } from '../calendar';
