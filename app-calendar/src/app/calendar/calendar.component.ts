@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { CalendarOptions, EventSourceInput } from '@fullcalendar/angular'; // useful for typechecking
 import { icalendarApi } from './calendar';
 import { CalendarService } from './services/calendar.service';
@@ -52,28 +52,28 @@ export class CalendarComponent implements OnInit {
   private hoy:string = this.formatDateDjango();
   private imgdefault:string = 'https://ec.europa.eu/eurostat/documents/6921402/9104237/Shutterstock_Lisa_Kolbasa.png/f988f8b6-4138-4a91-9761-885bacab0ce2?t=1533725002000';
 
-  public formControlCalendar:FormGroup = new FormGroup({
-    nombre: new FormControl('', Validators.compose([Validators.required])),
-    cedula: new FormControl('', Validators.compose([Validators.required])),
-    direccion: new FormControl('', Validators.compose([Validators.required])),
-    barrio: new FormControl('', Validators.compose([Validators.required])),
-    correo: new FormControl('', Validators.compose([Validators.required, Validators.email])),
-    tipoidentificacion: new FormControl('', Validators.compose([Validators.required])),
-    telefono: new FormControl('', Validators.compose([Validators.pattern('^[0-9]*$')])),
-    sexo: new FormControl(null),
-    adjuntocedula: new FormControl(this.imgdefault),
-    adjuntorut: new FormControl(this.imgdefault),
-    descripcion: new FormControl(null),
-    fecha_inicio: new FormControl(this.hoy, {validators: [Validators.required, DateTimeValidator]}),
-    fecha_vencimiento: new FormControl(this.hoy, {validators: [Validators.required, DateTimeValidator]}),
-    estado: new FormControl(1, Validators.compose([Validators.required])),
-    tiposolicitante: new FormControl(null, Validators.compose([Validators.required])),
-    discapacidad: new FormControl(null, Validators.compose([Validators.required])),
-    escenario: new FormControl(null, Validators.compose([Validators.required])),
-    tipoevento: new FormControl(null, Validators.compose([Validators.required])),
-    actividaddeportiva: new FormControl(null, Validators.compose([Validators.required])),
-    eventodeportivo: new FormControl(null, Validators.compose([Validators.required])),
-    check: new FormControl('', Validators.requiredTrue)
+  public formControlCalendar:UntypedFormGroup = new UntypedFormGroup({
+    nombre: new UntypedFormControl('', Validators.compose([Validators.required])),
+    cedula: new UntypedFormControl('', Validators.compose([Validators.required])),
+    direccion: new UntypedFormControl('', Validators.compose([Validators.required])),
+    barrio: new UntypedFormControl('', Validators.compose([Validators.required])),
+    correo: new UntypedFormControl('', Validators.compose([Validators.required, Validators.email])),
+    tipoidentificacion: new UntypedFormControl('', Validators.compose([Validators.required])),
+    telefono: new UntypedFormControl('', Validators.compose([Validators.pattern('^[0-9]*$')])),
+    sexo: new UntypedFormControl(null),
+    adjuntocedula: new UntypedFormControl(this.imgdefault),
+    adjuntorut: new UntypedFormControl(this.imgdefault),
+    descripcion: new UntypedFormControl(null),
+    fecha_inicio: new UntypedFormControl(this.hoy, {validators: [Validators.required, DateTimeValidator]}),
+    fecha_vencimiento: new UntypedFormControl(this.hoy, {validators: [Validators.required, DateTimeValidator]}),
+    estado: new UntypedFormControl(1, Validators.compose([Validators.required])),
+    tiposolicitante: new UntypedFormControl(null, Validators.compose([Validators.required])),
+    discapacidad: new UntypedFormControl(null, Validators.compose([Validators.required])),
+    escenario: new UntypedFormControl(null, Validators.compose([Validators.required])),
+    tipoevento: new UntypedFormControl(null, Validators.compose([Validators.required])),
+    actividaddeportiva: new UntypedFormControl(null, Validators.compose([Validators.required])),
+    eventodeportivo: new UntypedFormControl(null, Validators.compose([Validators.required])),
+    check: new UntypedFormControl('', Validators.requiredTrue)
   }, { updateOn: 'change' });
 
   public hoveredDate: NgbDate | null = null;
@@ -375,7 +375,7 @@ export class CalendarComponent implements OnInit {
 
 }
 
-export const DateTimeValidator = (fc: FormControl) => {
+export const DateTimeValidator = (fc: UntypedFormControl) => {
   const date = new Date(fc.value);
   const isValid = !isNaN(date.valueOf());
   return isValid ? null : {

@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, forwardRef, ViewChild, AfterViewInit, Injector } from "@angular/core";
 import { NgbTimeStruct, NgbDateStruct, NgbPopoverConfig, NgbPopover, NgbDatepicker, NgbModule } from "@ng-bootstrap/ng-bootstrap";
-import { NG_VALUE_ACCESSOR, ControlValueAccessor, NgControl, FormControl } from "@angular/forms";
+import { NG_VALUE_ACCESSOR, ControlValueAccessor, NgControl, UntypedFormControl } from "@angular/forms";
 import { DatePipe } from "@angular/common";
 import { DateTimeModel } from "./date-time.model";
 import { noop } from "rxjs";
@@ -166,7 +166,7 @@ export class DateTimePickerComponent implements ControlValueAccessor, OnInit, Af
 
 }
 
-export const DateTimeValidator = (fc: FormControl) => {
+export const DateTimeValidator = (fc: UntypedFormControl) => {
   const date = new Date(fc.value);
   const isValid = !isNaN(date.valueOf());
   return isValid ? null : {

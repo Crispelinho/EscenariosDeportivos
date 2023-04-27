@@ -121,7 +121,6 @@
       }
     }
   },
-  "defaultProject": "app-calendar",
   "cli": {
     "analytics": "3027ae74-31d7-47f4-9fdf-b47abbce0f17"
   }
