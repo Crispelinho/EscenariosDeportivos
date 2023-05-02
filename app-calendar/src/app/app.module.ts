@@ -15,6 +15,7 @@ import { DateTimePickerComponent } from './components/date-time-picker/date-time
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { ToastrModule } from 'ngx-toastr';
 
 
 /* Calendar.registerPlugins([ // register FullCalendar plugins
@@ -46,7 +47,8 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
     SelectDropDownModule,
     FontAwesomeModule,
     MatSnackBarModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    ToastrModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]

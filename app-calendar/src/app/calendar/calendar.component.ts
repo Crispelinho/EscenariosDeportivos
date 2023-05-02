@@ -349,8 +349,7 @@ export class CalendarComponent implements OnInit {
       .subscribe(request => {
         this.loadCalendar();
       });
-    /*  alert('SOLICITUD DE PRERESERVA REALIZADA CON  ÉXITO CONSULTE EN 15 DIAS HÁBILES CON SU NÚMERO DE CEDULA.'); */
-    return this.messageService.openSnackBar(`SOLICITUD DE PRERESERVA REALIZADA CON  ÉXITO CONSULTE EN 15 DIAS HÁBILES CON SU NÚMERO DE CEDULA.`, `Aceptar`);
+    return this.messageService.showSuccess("SOLICITUD DE PRERESERVA REALIZADA CON  ÉXITO CONSULTE EN 15 DIAS HÁBILES CON SU NÚMERO DE CEDULA.");
   }
 
   open(content: any) {
