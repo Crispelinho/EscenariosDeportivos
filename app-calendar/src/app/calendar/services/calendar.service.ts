@@ -6,7 +6,7 @@ import { icalendarApi } from '../calendar';
 
 export interface iMetodo {
   url:string,
-  data:object,
+  data:object | null,
   header?:HttpHeaders,
   port?:number 
 }
@@ -32,12 +32,12 @@ export class CalendarService {
     let method:iMetodo = {
       port: 8000,
       url:'solicitudes/',
-      data: null
+      data:null,
     }
     return this.https.get(`${this.baseurl}:${method.port}/${method.url}`, {});
   }
 
-  setEvent(data): Observable<any>{
+  setEvent(data:any): Observable<any>{
     let method:iMetodo = {
       port: 8000,
       url:'solicitudes/',

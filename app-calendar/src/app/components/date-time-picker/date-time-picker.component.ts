@@ -26,7 +26,7 @@ export class DateTimePickerComponent implements ControlValueAccessor, OnInit, Af
   public faCalendarWeek = faCalendarWeek;
   public faClock = faClock;
 
-  @Input() public dateString: string;
+  @Input() public dateString!: string;
   @Input() public inputDatetimeFormat = "M/d/yyyy H:mm:ss";
   @Input() public hourStep = 1;
   @Input() public minuteStep = 15;
@@ -44,12 +44,12 @@ export class DateTimePickerComponent implements ControlValueAccessor, OnInit, Af
   // private dp: NgbDatepicker;
 
   @ViewChild(NgbPopover, { static: true })
-  private popover: NgbPopover;
+  private popover!: NgbPopover;
 
   private onTouched: () => void = noop;
   private onChange: (_: any) => void = noop;
 
-  public ngControl: NgControl;
+  public ngControl!: NgControl;
 
   constructor(private config: NgbPopoverConfig, private inj: Injector) {
     config.autoClose = "outside";
@@ -87,7 +87,7 @@ export class DateTimePickerComponent implements ControlValueAccessor, OnInit, Af
     this.onTouched = fn;
   }
 
-  toggleDateTimeState($event) {
+  toggleDateTimeState($event:any) {
     this.showTimePickerToggle = !this.showTimePickerToggle;
     $event.stopPropagation();
   }
@@ -160,7 +160,7 @@ export class DateTimePickerComponent implements ControlValueAccessor, OnInit, Af
     }
   }
 
-  inputBlur($event) {
+  inputBlur($event:any) {
     this.onTouched();
   }
 

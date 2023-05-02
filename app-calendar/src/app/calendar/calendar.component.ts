@@ -1,90 +1,124 @@
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { CalendarOptions, EventSourceInput } from '@fullcalendar/angular'; // useful for typechecking
+import { FormControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { CalendarOptions, EventSourceInput } from '@fullcalendar/core'; // useful for typechecking
 import { icalendarApi } from './calendar';
 import { CalendarService } from './services/calendar.service';
-import {NgbModal, ModalDismissReasons, NgbDate, NgbCalendar} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, ModalDismissReasons, NgbDate, NgbCalendar } from '@ng-bootstrap/ng-bootstrap';
 /* import { MessageService } from '../message.service' */
-
-
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/daygrid';
+import listPlugin from '@fullcalendar/interaction';
+import interactionPlugin from '@fullcalendar/interaction';
+import { MessageService } from '../message.service';
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss']
 })
 export class CalendarComponent implements OnInit {
+  calendarVisible = true;
+  eventGuid = 0;
 
-  public calendarOptions: CalendarOptions = null;
-  public closeResult:string = '';
-  
-  public array_tipo_id:Array<Object> = [
-    {id: 1, nombre: "CC"},
-    {id: 2, nombre: "TI"},
-    {id: 3, nombre: "PA"}
+  calendarOptions: CalendarOptions = {
+    plugins: [
+      dayGridPlugin,
+      timeGridPlugin,
+      listPlugin,
+      interactionPlugin
+    ],
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth'
+    },
+    initialView: 'dayGridMonth',
+    // initialEvents: INITIAL_EVENTS, // alternatively, use the `events` setting to fetch from a feed
+    weekends: true,
+    editable: true,
+    selectable: true,
+    selectMirror: true,
+    dayMaxEvents: true,
+    select: this.handleDateClick.bind(this),
+    //eventClick: this.handleDateClick.bind(this),
+    //eventsSet: this.handleEvents.bind(this)
+    /* you can update a remote database when these fire:
+    eventAdd:
+    eventChange:
+    eventRemove:
+    */
+  }
+
+  public closeResult: string = '';
+  public cal: icalendarApi[];
+
+  public array_tipo_id: Array<Object> = [
+    { id: 1, nombre: "CC" },
+    { id: 2, nombre: "TI" },
+    { id: 3, nombre: "PA" }
   ];
-  public configTipoId:Object = null;
+  public configTipoId!: Object | any;
 
-  public array_sexo:Array<Object> = [
-    {id: 1, nombre: "Masculino"},
-    {id: 2, nombre: "Femenino"},
-    {id: 3, nombre: "Otro"}
+  public array_sexo: Array<Object> = [
+    { id: 1, nombre: "Masculino" },
+    { id: 2, nombre: "Femenino" },
+    { id: 3, nombre: "Otro" }
   ];
-  public configSexo:Object = null;
-  
-  public array_tiposolicitante:Array<Object> = null;
-  public configtiposolicitante:Object = null;
-  
-  public array_discapacidad:Array<Object> = null;
-  public configdiscapacidad:Object = null;
-  
-  public array_escenario:Array<Object> = null;
-  public configescenario:Object = null;
+  public configSexo: Object | any;
 
-  public array_tipoevento:Array<Object> = null;
-  public configtipoevento:Object = null;
+  public array_tiposolicitante!: Array<Object>;
+  public configtiposolicitante!: Object | any;
 
-  public array_actividaddeportiva:Array<Object> = null;
-  public configactividaddeportiva:Object = null;
+  public array_discapacidad!: Array<Object>;
+  public configdiscapacidad!: Object | any;
 
-  public array_eventodeportivo:Array<Object> = null;
-  public configeventodeportivo:Object = null;
+  public array_escenario!: Array<Object>;
+  public configescenario!: Object | any;
 
-  private hoy:string = this.formatDateDjango();
-  private imgdefault:string = 'https://ec.europa.eu/eurostat/documents/6921402/9104237/Shutterstock_Lisa_Kolbasa.png/f988f8b6-4138-4a91-9761-885bacab0ce2?t=1533725002000';
+  public array_tipoevento!: Array<Object>;
+  public configtipoevento!: Object | any;
 
-  public formControlCalendar:UntypedFormGroup = new UntypedFormGroup({
-    nombre: new UntypedFormControl('', Validators.compose([Validators.required])),
-    cedula: new UntypedFormControl('', Validators.compose([Validators.required])),
-    direccion: new UntypedFormControl('', Validators.compose([Validators.required])),
-    barrio: new UntypedFormControl('', Validators.compose([Validators.required])),
-    correo: new UntypedFormControl('', Validators.compose([Validators.required, Validators.email])),
-    tipoidentificacion: new UntypedFormControl('', Validators.compose([Validators.required])),
-    telefono: new UntypedFormControl('', Validators.compose([Validators.pattern('^[0-9]*$')])),
-    sexo: new UntypedFormControl(null),
-    adjuntocedula: new UntypedFormControl(this.imgdefault),
-    adjuntorut: new UntypedFormControl(this.imgdefault),
-    descripcion: new UntypedFormControl(null),
-    fecha_inicio: new UntypedFormControl(this.hoy, {validators: [Validators.required, DateTimeValidator]}),
-    fecha_vencimiento: new UntypedFormControl(this.hoy, {validators: [Validators.required, DateTimeValidator]}),
-    estado: new UntypedFormControl(1, Validators.compose([Validators.required])),
-    tiposolicitante: new UntypedFormControl(null, Validators.compose([Validators.required])),
-    discapacidad: new UntypedFormControl(null, Validators.compose([Validators.required])),
-    escenario: new UntypedFormControl(null, Validators.compose([Validators.required])),
-    tipoevento: new UntypedFormControl(null, Validators.compose([Validators.required])),
-    actividaddeportiva: new UntypedFormControl(null, Validators.compose([Validators.required])),
-    eventodeportivo: new UntypedFormControl(null, Validators.compose([Validators.required])),
-    check: new UntypedFormControl('', Validators.requiredTrue)
+  public array_actividaddeportiva!: Array<Object>;
+  public configactividaddeportiva!: Object | any;
+
+  public array_eventodeportivo!: Array<Object>;
+  public configeventodeportivo!: Object | any;
+
+  private hoy: string = this.formatDateDjango();
+  private imgdefault: string = 'https://ec.europa.eu/eurostat/documents/6921402/9104237/Shutterstock_Lisa_Kolbasa.png/f988f8b6-4138-4a91-9761-885bacab0ce2?t=1533725002000';
+
+  public formControlCalendar: UntypedFormGroup | any = new UntypedFormGroup({
+    nombre: new FormControl('', Validators.compose([Validators.required])),
+    cedula: new FormControl('', Validators.compose([Validators.required])),
+    direccion: new FormControl('', Validators.compose([Validators.required])),
+    barrio: new FormControl('', Validators.compose([Validators.required])),
+    correo: new FormControl('', Validators.compose([Validators.required, Validators.email])),
+    tipoidentificacion: new FormControl('', Validators.compose([Validators.required])),
+    telefono: new FormControl('', Validators.compose([Validators.pattern('^[0-9]*$')])),
+    sexo: new FormControl(null),
+    adjuntocedula: new FormControl(this.imgdefault),
+    adjuntorut: new FormControl(this.imgdefault),
+    descripcion: new FormControl(null),
+    fecha_inicio: new FormControl(this.hoy, [Validators.required, DateTimeValidator]),
+    fecha_vencimiento: new FormControl(this.hoy, [Validators.required, DateTimeValidator]),
+    estado: new FormControl(1, Validators.compose([Validators.required])),
+    tiposolicitante: new FormControl(null, Validators.compose([Validators.required])),
+    discapacidad: new FormControl(null, Validators.compose([Validators.required])),
+    escenario: new FormControl(null, Validators.compose([Validators.required])),
+    tipoevento: new FormControl(null, Validators.compose([Validators.required])),
+    actividaddeportiva: new FormControl(null, Validators.compose([Validators.required])),
+    eventodeportivo: new FormControl(null, Validators.compose([Validators.required])),
+    check: new FormControl('', Validators.requiredTrue)
   }, { updateOn: 'change' });
 
   public hoveredDate: NgbDate | null = null;
   public fromDate: NgbDate;
   public toDate: NgbDate | null = null;
-  private imgFormCurrent:string = '';
-  
+  private imgFormCurrent: string = '';
+
   constructor(
-    private calendarService:CalendarService,
+    private calendarService: CalendarService,
     private modalService: NgbModal,
-    /* private messageService: MessageService, */
+    private messageService: MessageService,
     private calendar: NgbCalendar
   ) {
     this.fromDate = calendar.getToday();
@@ -96,12 +130,12 @@ export class CalendarComponent implements OnInit {
     this.loadCalendar();
   }
 
-  iniciarVariables(){
+  iniciarVariables() {
     this.configTipoId = {
       displayKey: 'nombre',
       height: '250px',
       placeholder: 'Tipo de identificacion',
-      customComparator: () => {},
+      customComparator: () => { },
       moreText: 'more',
       noResultsFound: 'No se encontraron resultados',
       searchPlaceholder: 'Buscar...',
@@ -112,7 +146,7 @@ export class CalendarComponent implements OnInit {
       displayKey: 'nombre',
       height: '250px',
       placeholder: 'Genero',
-      customComparator: () => {},
+      customComparator: () => { },
       moreText: 'more',
       noResultsFound: 'No se encontraron resultados',
       searchPlaceholder: 'Buscar...',
@@ -127,161 +161,178 @@ export class CalendarComponent implements OnInit {
     this.getEventoDeportivo();
   }
 
-  getTipoSolicitantes(){
-    this.array_tiposolicitante = null;
-    this.configtiposolicitante = null;
+  getTipoSolicitantes() {
+    this.array_tiposolicitante;
+    this.configtiposolicitante;
     this.calendarService.getTipoSolicitantes()
-    .subscribe((data:Array<object>) =>{
-      this.array_tiposolicitante = data;
-      this.configtiposolicitante = {
-        displayKey: 'nombre',
-        height: '250px',
-        search: true,
-        placeholder: 'Tipo de solicitante',
-        customComparator: () => {},
-        moreText: 'more',
-        noResultsFound: 'No se encontraron resultados',
-        searchPlaceholder: 'Buscar...',
-        searchOnKey: 'nombre',
-        clearOnSelection: false
-      };
-    });
+      .subscribe((data: Array<object>) => {
+        this.array_tiposolicitante = data;
+        this.configtiposolicitante = {
+          displayKey: 'nombre',
+          height: '250px',
+          search: true,
+          placeholder: 'Tipo de solicitante',
+          customComparator: () => { },
+          moreText: 'more',
+          noResultsFound: 'No se encontraron resultados',
+          searchPlaceholder: 'Buscar...',
+          searchOnKey: 'nombre',
+          clearOnSelection: false
+        };
+      });
   }
 
-  getDiscapacidad(){
-    this.array_discapacidad = null;
-    this.configdiscapacidad = null;
+  getDiscapacidad() {
+    this.array_discapacidad;
+    this.configdiscapacidad;
     this.calendarService.getDiscapacidad()
-    .subscribe((data:Array<object>) =>{
-      this.array_discapacidad = data;
-      this.configdiscapacidad = {
-        displayKey: 'nombre',
-        height: '250px',
-        search: true,
-        placeholder: 'Discapacidad',
-        customComparator: () => {},
-        moreText: 'more',
-        noResultsFound: 'No se encontraron resultados',
-        searchPlaceholder: 'Buscar...',
-        searchOnKey: 'nombre',
-        clearOnSelection: false
-      };
-    });
+      .subscribe((data: Array<object>) => {
+        this.array_discapacidad = data;
+        this.configdiscapacidad = {
+          displayKey: 'nombre',
+          height: '250px',
+          search: true,
+          placeholder: 'Discapacidad',
+          customComparator: () => { },
+          moreText: 'more',
+          noResultsFound: 'No se encontraron resultados',
+          searchPlaceholder: 'Buscar...',
+          searchOnKey: 'nombre',
+          clearOnSelection: false
+        };
+      });
   }
 
-  getEscenario(){
-    this.array_escenario = null;
-    this.configescenario = null;
+  getEscenario() {
+    this.array_escenario;
+    this.configescenario;
     this.calendarService.getEscenario()
-    .subscribe((data:Array<object>) =>{
-      this.array_escenario = data;
-      this.configescenario = {
-        displayKey: 'nombre',
-        height: '250px',
-        search: true,
-        placeholder: 'Escenario deportivo',
-        customComparator: () => {},
-        moreText: 'more',
-        noResultsFound: 'No se encontraron resultados',
-        searchPlaceholder: 'Buscar...',
-        searchOnKey: 'nombre',
-        clearOnSelection: false
-      };
-    });
+      .subscribe((data: Array<object>) => {
+        this.array_escenario = data;
+        this.configescenario = {
+          displayKey: 'nombre',
+          height: '250px',
+          search: true,
+          placeholder: 'Escenario deportivo',
+          customComparator: () => { },
+          moreText: 'more',
+          noResultsFound: 'No se encontraron resultados',
+          searchPlaceholder: 'Buscar...',
+          searchOnKey: 'nombre',
+          clearOnSelection: false
+        };
+      });
   }
 
-  getTipoEvento(){
-    this.array_tipoevento = null;
-    this.configtipoevento = null;
+  getTipoEvento() {
+    this.array_tipoevento;
+    this.configtipoevento;
     this.calendarService.getTipoEvento()
-    .subscribe((data:Array<object>) =>{
-      this.array_tipoevento = data;
-      this.configtipoevento = {
-        displayKey: 'nombre',
-        height: '250px',
-        search: true,
-        placeholder: 'Evento deportivo',
-        customComparator: () => {},
-        moreText: 'more',
-        noResultsFound: 'No se encontraron resultados',
-        searchPlaceholder: 'Buscar...',
-        searchOnKey: 'nombre',
-        clearOnSelection: false
-      };
-    });
+      .subscribe((data: Array<object>) => {
+        this.array_tipoevento = data;
+        this.configtipoevento = {
+          displayKey: 'nombre',
+          height: '250px',
+          search: true,
+          placeholder: 'Evento deportivo',
+          customComparator: () => { },
+          moreText: 'more',
+          noResultsFound: 'No se encontraron resultados',
+          searchPlaceholder: 'Buscar...',
+          searchOnKey: 'nombre',
+          clearOnSelection: false
+        };
+      });
   }
 
-  getActividadDeportiva(){
-    this.array_actividaddeportiva = null;
-    this.configactividaddeportiva = null;
+  getActividadDeportiva() {
+    this.array_actividaddeportiva;
+    this.configactividaddeportiva;
     this.calendarService.getActividadDeportiva()
-    .subscribe((data:Array<object>) =>{
-      this.array_actividaddeportiva = data;
-      this.configactividaddeportiva = {
-        displayKey: 'nombre',
-        height: '250px',
-        search: true,
-        placeholder: 'Actividad deportiva',
-        customComparator: () => {},
-        moreText: 'more',
-        noResultsFound: 'No se encontraron resultados',
-        searchPlaceholder: 'Buscar...',
-        searchOnKey: 'nombre',
-        clearOnSelection: false
-      };
-    });
+      .subscribe((data: Array<object>) => {
+        this.array_actividaddeportiva = data;
+        this.configactividaddeportiva = {
+          displayKey: 'nombre',
+          height: '250px',
+          search: true,
+          placeholder: 'Actividad deportiva',
+          customComparator: () => { },
+          moreText: 'more',
+          noResultsFound: 'No se encontraron resultados',
+          searchPlaceholder: 'Buscar...',
+          searchOnKey: 'nombre',
+          clearOnSelection: false
+        };
+      });
   }
 
-  getEventoDeportivo(){
-    this.array_eventodeportivo = null;
-    this.configeventodeportivo = null;
+  getEventoDeportivo() {
+    this.array_eventodeportivo;
+    this.configeventodeportivo;
     this.calendarService.getEventoDeportivo()
-    .subscribe((data:Array<object>) =>{
-      this.array_eventodeportivo = data;
-      this.configeventodeportivo = {
-        displayKey: 'nombre',
-        height: '250px',
-        search: true,
-        placeholder: 'Regimen',
-        customComparator: () => {},
-        moreText: 'more',
-        noResultsFound: 'No se encontraron resultados',
-        searchPlaceholder: 'Buscar...',
-        searchOnKey: 'nombre',
-        clearOnSelection: false
-      };
-    });
+      .subscribe((data: Array<object>) => {
+        this.array_eventodeportivo = data;
+        this.configeventodeportivo = {
+          displayKey: 'nombre',
+          height: '250px',
+          search: true,
+          placeholder: 'Regimen',
+          customComparator: () => { },
+          moreText: 'more',
+          noResultsFound: 'No se encontraron resultados',
+          searchPlaceholder: 'Buscar...',
+          searchOnKey: 'nombre',
+          clearOnSelection: false
+        };
+      });
   }
 
-  loadCalendar(){
+
+
+  loadCalendar() {
     this.calendarService.getEvents()
-    .subscribe((data:Array<icalendarApi>) =>{
-      data.map(item=>{
-        item.start = item.fecha_inicio;
-        item.end = item.fecha_vencimiento;
-        item.title = item.nombre;
-        return item;
+      .subscribe((resp: any) => {
+        this.cal = resp
+        resp.map((item: any) => {
+          item.title = item.nombre;
+          item.start = item.fecha_inicio;
+          item.end = item.fecha_vencimiento;
+          return item;
+        })
+        this.calendarOptions = {
+          events: resp,
+          dateClick: this.handleDateClick.bind(this)
+
+        }
       })
-      this.calendarOptions = {
-        initialView: 'dayGridMonth',
-        dateClick: this.handleDateClick.bind(this), // bind is important!
-        events: data
-      };
-    });
   }
 
-  handleDateClick(arg) {
-    alert('date click! ' + arg.dateStr)
+  handleDateClick(arg: any) {
+    const title = prompt('Please enter a new title for your event');
+    const calendarApi = arg.view.calendar;
+    const { fecha_inicio, fecha_vencimiento } = this.formControlCalendar;
+
+    calendarApi.unselect(); // clear date selection
+
+    if (title) {
+      calendarApi.addEvent({
+        id: this.eventGuid++,
+        title,
+        start: fecha_inicio,
+        end: fecha_vencimiento,
+        allDay: arg.allDay
+      });
+    }
   }
 
-  enviarEvento(){
-    if(this.formControlCalendar.invalid){
+  enviarEvento() {
+    if (this.formControlCalendar.invalid) {
       return alert('Completar todos los campos');
     }
-    
+
     let dataenviar = this.formControlCalendar.getRawValue();
 
-    if(!dataenviar.check) return alert('Por favor acepta las políticas de tratamiento de datos.');
+    if (!dataenviar.check) return alert('Por favor acepta las políticas de tratamiento de datos.');
 
     dataenviar.tipoidentificacion = dataenviar.tipoidentificacion.nombre;
     dataenviar.sexo = dataenviar.sexo.nombre;
@@ -295,20 +346,20 @@ export class CalendarComponent implements OnInit {
     dataenviar.adjuntorut != this.imgdefault ? dataenviar.adjuntorut : null;
 
     this.calendarService.setEvent(dataenviar)
-    .subscribe(request => {
-      this.loadCalendar();
-    });
-    return alert('SOLICITUD DE PRERESERVA REALIZADA CON  ÉXITO CONSULTE EN 15 DIAS HÁBILES CON SU NÚMERO DE CEDULA.');
-    /* this.messageService.openSnackBar(`SOLICITUD DE PRERESERVA REALIZADA CON  ÉXITO CONSULTE EN 15 DIAS HÁBILES CON SU NÚMERO DE CEDULA.`, `Aceptar`); */
+      .subscribe(request => {
+        this.loadCalendar();
+      });
+    /*  alert('SOLICITUD DE PRERESERVA REALIZADA CON  ÉXITO CONSULTE EN 15 DIAS HÁBILES CON SU NÚMERO DE CEDULA.'); */
+    return this.messageService.openSnackBar(`SOLICITUD DE PRERESERVA REALIZADA CON  ÉXITO CONSULTE EN 15 DIAS HÁBILES CON SU NÚMERO DE CEDULA.`, `Aceptar`);
   }
 
-  open(content) {
-    this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title', size: 'lg'}).result
-    .then((result) => {
-      this.closeResult = `Closed with: ${result}`;
-    }, (reason) => {
-      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-    });
+  open(content: any) {
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title', size: 'lg' }).result
+      .then((result) => {
+        this.closeResult = `Closed with: ${result}`;
+      }, (reason) => {
+        this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+      });
   }
 
   getDismissReason(reason: any): string {
@@ -344,7 +395,7 @@ export class CalendarComponent implements OnInit {
     return date.equals(this.fromDate) || (this.toDate && date.equals(this.toDate)) || this.isInside(date) || this.isHovered(date);
   }
 
-  handleInputChange(e, form:string) {
+  handleInputChange(e: any, form: string) {
     var file = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0];
     var pattern = /image-*/;
     var reader = new FileReader();
@@ -356,7 +407,7 @@ export class CalendarComponent implements OnInit {
     reader.onload = this._handleReaderLoaded.bind(this);
     reader.readAsDataURL(file);
   }
-  _handleReaderLoaded(e) {
+  _handleReaderLoaded(e: any) {
     let reader = e.target;
     this.formControlCalendar.get(`${this.imgFormCurrent}`).setValue(reader.result);
     this.formControlCalendar.get(`${this.imgFormCurrent}`).updateValueAndValidity();
@@ -364,13 +415,13 @@ export class CalendarComponent implements OnInit {
 
   formatDateDjango() {
     let d = new Date(),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
+      month = '' + (d.getMonth() + 1),
+      day = '' + d.getDate(),
+      year = d.getFullYear();
     if (month.length < 2) month = '0' + month;
     if (day.length < 2) day = '0' + day;
     let fecha = [year, month, day].join('-');
-    return fecha+'T'+d.toTimeString().split(' ')[0]+'.'+d.getMilliseconds()
+    return fecha + 'T' + d.toTimeString().split(' ')[0] + '.' + d.getMilliseconds()
   }
 
 }
@@ -379,8 +430,8 @@ export const DateTimeValidator = (fc: UntypedFormControl) => {
   const date = new Date(fc.value);
   const isValid = !isNaN(date.valueOf());
   return isValid ? null : {
-      isValid: {
-          valid: false
-      }
+    isValid: {
+      valid: true
+    }
   };
 };

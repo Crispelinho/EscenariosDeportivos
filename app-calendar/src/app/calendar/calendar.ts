@@ -1,4 +1,4 @@
- interface icalendarApi {
+ export interface icalendarApi {
     nombre: string
     direccion: string
     barrio: string
@@ -22,6 +22,6 @@
     title: string
 }
 
-export {
+/* export {
     icalendarApi
-}
+} */

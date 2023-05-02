@@ -4,14 +4,14 @@ import { DatePipe } from "@angular/common";
 export interface NgbDateTimeStruct extends NgbDateStruct, NgbTimeStruct {}
 
 export class DateTimeModel implements NgbDateTimeStruct {
-  year: number;
-  month: number;
-  day: number;
-  hour: number;
-  minute: number;
-  second: number;
+  year!: number;
+  month!: number;
+  day!: number;
+  hour!: number;
+  minute!: number;
+  second!: number;
 
-  timeZoneOffset: number;
+  timeZoneOffset!: number;
 
   public constructor(init?: Partial<DateTimeModel>) {
     Object.assign(this, init);
@@ -23,7 +23,7 @@ export class DateTimeModel implements NgbDateTimeStruct {
     const isValidDate = !isNaN(date.valueOf());
 
     if (!dateString || !isValidDate) {
-      return null;
+      /* return null; */
     }
 
     return new DateTimeModel({
@@ -74,7 +74,7 @@ export class DateTimeModel implements NgbDateTimeStruct {
 
       const tzo = -this.timeZoneOffset;
       const dif = tzo >= 0 ? "+" : "-",
-        pad = function(num) {
+        pad = function(num:any) {
           const norm = Math.floor(Math.abs(num));
           return (norm < 10 ? "0" : "") + norm;
         };
@@ -85,6 +85,6 @@ export class DateTimeModel implements NgbDateTimeStruct {
       return isoString;
     }
 
-    return null;
+    return 'null';
   }
 }

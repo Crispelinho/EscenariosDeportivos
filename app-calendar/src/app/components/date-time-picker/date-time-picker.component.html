@@ -1,6 +1,6 @@
 <div class="input-group mr-2">
 	<input
-		[ngClass]="ngControl?.valid ? 'ng-valid' : 'ng-invalid'"
+		[ngClass]="[ngControl.valid ? 'ng-valid' : 'ng-invalid']"
 		class="form-control"
 		(blur)="inputBlur($event)"
 		[ngModel]="dateString | date:inputDatetimeFormat"
@@ -28,7 +28,7 @@
 				(ngModelChange)="onDateChange($event, dp)"></ngb-datepicker>
 			<button
 				class="btn btn-block btn-outline-secondary"
-				[disabled]="!datetime?.day"
+				[disabled]="!datetime.day"
 				type="button"
 				(click)="toggleDateTimeState($event)">
 				<fa-icon [icon]="faClock"></fa-icon>

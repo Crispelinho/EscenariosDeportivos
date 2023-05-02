@@ -93,14 +93,14 @@
                     <div class="mb-2 col-12 col-lg-6">
                             <p>Agregar Cedula</p>
                             <label for="imageUrl" class="image-upload">
-                                <img [src]="formControlCalendar?.get('adjuntocedula')?.value" class="img-fluid"/>
+                                <img [src]="formControlCalendar.get('adjuntocedula')?.value" class="img-fluid"/>
                                 <input class="d-none" id="imageUrl" type="file" accept="image/*" (change)="handleInputChange($event, 'adjuntocedula')" />
                             </label>
                     </div>
                     <div class="mb-2 col-12 col-lg-6">
                         <p>Agregar RUT</p>
                         <label for="imageUrlrut" class="image-upload">
-                            <img [src]="formControlCalendar?.get('adjuntorut')?.value" class="img-fluid"/>
+                            <img [src]="formControlCalendar.get('adjuntorut')?.value" class="img-fluid"/>
                             <input class="d-none" id="imageUrlrut" type="file" accept="image/*" (change)="handleInputChange($event, 'adjuntorut')" />
                         </label>
                     </div>
@@ -112,7 +112,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-success" [disabled]="formControlCalendar?.invalid" (click)="modal.close('Save click')">Crear</button>
+                <button type="submit" class="btn btn-success" [disabled]="formControlCalendar.invalid" (click)="modal.close('Save click')">Crear</button>
                 <!-- <button type="submit" class="btn btn-success">Crear</button> -->
             </div>
         </form>
